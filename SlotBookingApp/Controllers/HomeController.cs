@@ -1,62 +1,42 @@
 using Microsoft.AspNetCore.Mvc;
-using SlotBookingApp.Helpers;
 using SlotBookingApp.Models;
 using System.Diagnostics;
-using System.Net.Http.Headers;
-using System.Text;
-using SlotBookingApp.Helpers;
+using SlotBookingApp.Domain.Entities;
+using SlotBookingApp.Infrastructure.Interfaces;
 
-namespace SlotBookingApp.Controllers
+
+namespace SlotBookingApp.Web.Controllers;
+
+public class HomeController : Controller
 {
-    public class HomeController : Controller
+    private readonly ILogger<HomeController> _logger;
+    private readonly IScheduleService _scheduleService;
+
+    public HomeController(ILogger<HomeController> logger, IScheduleService scheduleService)
     {
-        private readonly ILogger<HomeController> _logger;
-        private readonly DateHelper _dateHelper;
-        private readonly HttpClient _httpClient;
+        _logger = logger;
+        _scheduleService = scheduleService;
+    }
 
-        public HomeController(ILogger<HomeController> logger, DateHelper dateHelper, IHttpClientFactory httpClientFactory)
-        {
-            _logger = logger;
-            _dateHelper = dateHelper;
+    public IActionResult Index()
+    {
+        return View();
+    }
 
-            _httpClient = httpClientFactory.CreateClient("ExternalApi");
-            var authToken = Convert.ToBase64String(Encoding.ASCII.GetBytes("techuser:secretpassWord"));
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authToken);
-        }
+    [HttpGet]
+    public async Task<JsonResult> GetEvents(string date)
+    {
+        ;
+        var scheduleData = await _scheduleService.GetSchedule(date) ;
+        //todo
+        //List<CalendarEvent> availableSlots = await GetAvailableSlots(weeklySchedule);
+        return Json(new List<CalendarEvent>());
+        //return Json(availableSlots);
+    }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
-
-        [HttpGet]
-        public async Task<JsonResult> GetEvents(string date)
-        {
-            var response = await _httpClient.GetAsync($"availability/GetWeeklyAvailability/{_dateHelper.GetWeeksMonday(date)}");
-            if (response.IsSuccessStatusCode)
-            {
-                var events = await response.Content.ReadFromJsonAsync<List<CalendarEvent>>();
-                return Json(events);
-            }
-            else
-            {
-                // Handle error or return an empty list
-                return Json(new List<CalendarEvent>());
-            }
-        }
-
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-
-        // todo move to its own class
-        public class CalendarEvent
-        {
-            public string Title { get; set; }
-            public string Start { get; set; }
-            public string End { get; set; }
-        }
+[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult Error()
+    {
+        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 }
