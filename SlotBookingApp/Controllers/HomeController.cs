@@ -24,14 +24,11 @@ public class HomeController : Controller
     }
 
     [HttpGet]
-    public async Task<JsonResult> GetEvents(string date)
+    public async Task<JsonResult> GetAvailableSlots(string date)
     {
-        ;
-        var scheduleData = await _scheduleService.GetSchedule(date) ;
-        //todo
-        //List<CalendarEvent> availableSlots = await GetAvailableSlots(weeklySchedule);
-        return Json(new List<CalendarEvent>());
-        //return Json(availableSlots);
+        var scheduleData = await _scheduleService.GetSchedule(date);
+        List<CalendarEvent> availableSlots = await _scheduleService.GetAvailableSlots(scheduleData, date);
+        return Json(availableSlots);
     }
 
 [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

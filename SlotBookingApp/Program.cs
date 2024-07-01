@@ -10,6 +10,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IScheduleService, ScheduleService>();
 
 builder.Services.AddScoped<DateHelper>();
+builder.Services.AddScoped<SlotsHelper>();
 
 builder.Services.AddHttpClient("ExternalApi", client =>
 {
