@@ -1,11 +1,10 @@
-﻿using System.Net.Http.Headers;
-using System.Text;
+﻿using Newtonsoft.Json;
 using SlotBookingApp.Infrastructure.Dtos;
 using SlotBookingApp.Infrastructure.Helpers;
-using System.Net.Http.Json;
 using SlotBookingApp.Infrastructure.Interfaces;
-using SlotBookingApp.Domain.Entities;
-using System;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Text;
 
 
 namespace SlotBookingApp.Infrastructure.Services;
@@ -36,13 +35,13 @@ public class ScheduleService : IScheduleService
         return weeklySchedule;
     }
 
-    public async Task<List<CalendarEvent>> GetAvailableSlots(ScheduleData scheduleData, string date)
+    public async Task<List<Object>> GetAvailableSlots(ScheduleData scheduleData, string date)
     {
         List<string> allSlots =  await _slotsHelper.GetAllSlots(scheduleData, date);
         List<string> busySlots = await _slotsHelper.GetBusySlots(scheduleData);
         List<string> availableSlots = allSlots.Except(busySlots).ToList();
-        //need to map availableslots to CalendarEvent
-        //return await Task.FromResult(availableSlots);
-        return new List<CalendarEvent>();
+        var testll = JsonConvert.SerializeObject(availableSlots);
+        var calendarEvents = _slotsHelper.FormatCalendarEventsForFullCalendar(availableSlots);
+        return calendarEvents;
     } 
 }

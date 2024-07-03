@@ -1,4 +1,5 @@
 ﻿using SlotBookingApp.Infrastructure.Dtos;
+using System.Globalization;
 
 namespace SlotBookingApp.Infrastructure.Helpers;
 
@@ -49,7 +50,7 @@ public class SlotsHelper
         return periodSlots;
     }
 
-    internal async Task<List<string>> GetBusySlots(ScheduleData scheduleData)
+    public async Task<List<string>> GetBusySlots(ScheduleData scheduleData)
     {
         var formattedSlots = new List<string>();
 
@@ -70,5 +71,31 @@ public class SlotsHelper
             });
 
         return formattedSlots;
+    }
+
+    public List<object> FormatCalendarEventsForFullCalendar(List<string> availableSlots)
+    {
+        List<object> events = new List<object>();
+
+        Parallel.ForEach(availableSlots, slot =>
+        {
+            string[] times = slot.Split(" - ");
+            string startTimeString = times[0];
+            string endTimeString = times[1];
+
+            DateTime startDateTime = DateTime.ParseExact(startTimeString, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+            DateTime endDateTime = DateTime.ParseExact(endTimeString, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+
+            string startISO = startDateTime.ToString("yyyy-MM-ddTHH:mm:ss");
+            string endISO = endDateTime.ToString("yyyy-MM-ddTHH:mm:ss");
+
+            events.Add(new
+            {
+                start = startISO,
+                end = endISO
+            });
+        });
+
+        return events;
     }
 }

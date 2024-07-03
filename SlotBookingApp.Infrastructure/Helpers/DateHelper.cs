@@ -21,7 +21,7 @@ public class DateHelper
         List<string> result = new List<string>();
 
         DateTime current = start;
-        while (current < end)
+        while (current < end && current > DateTime.Now)
         {
             result.Add($"{current} - {current.AddMinutes(intervalMinutes)}");
             current = current.AddMinutes(intervalMinutes);

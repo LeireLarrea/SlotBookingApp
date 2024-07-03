@@ -5,6 +5,6 @@ namespace SlotBookingApp.Infrastructure.Interfaces;
 
 public interface IScheduleService
 {
-    Task<List<CalendarEvent>> GetAvailableSlots(ScheduleData scheduleData, string date);
+    Task<List<Object>> GetAvailableSlots(ScheduleData scheduleData, string date);
     Task<ScheduleData> GetSchedule(string date);
 }
