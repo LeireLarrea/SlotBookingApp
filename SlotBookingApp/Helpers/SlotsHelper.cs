@@ -1,7 +1,7 @@
 ﻿using SlotBookingApp.Infrastructure.Dtos;
 using System.Globalization;
 
-namespace SlotBookingApp.Infrastructure.Helpers;
+namespace SlotBookingApp.Helpers;
 
 public class SlotsHelper
 {

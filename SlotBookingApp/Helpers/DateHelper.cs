@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace SlotBookingApp.Infrastructure.Helpers;
+namespace SlotBookingApp.Helpers;
 
 public class DateHelper
 {

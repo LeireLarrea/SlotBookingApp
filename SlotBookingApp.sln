@@ -3,15 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SlotBookingApp.Web", "SlotBookingApp\SlotBookingApp.Web.csproj", "{F8E58B3D-438D-4C6D-85D3-5977AEAFB3B5}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlotBookingApp.Domain", "SlotBookingApp.Domain\SlotBookingApp.Domain.csproj", "{4713E92B-D7FC-4B52-98BB-49F995F3E5F1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlotBookingApp.Application", "SlotBookingApp.Application\SlotBookingApp.Application.csproj", "{93A84975-7179-47A1-BCD3-C9226B7A9A55}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlotBookingApp.Infrastructure", "SlotBookingApp.Infrastructure\SlotBookingApp.Infrastructure.csproj", "{B40A8105-7DBE-4003-827E-C95DDFAF95B9}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{66A96CF3-E9B9-40C0-A2A9-191B9BD016F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SlotBookingApp", "SlotBookingApp\SlotBookingApp.csproj", "{F8E58B3D-438D-4C6D-85D3-5977AEAFB3B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,25 +15,9 @@ Global
 		{F8E58B3D-438D-4C6D-85D3-5977AEAFB3B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8E58B3D-438D-4C6D-85D3-5977AEAFB3B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F8E58B3D-438D-4C6D-85D3-5977AEAFB3B5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4713E92B-D7FC-4B52-98BB-49F995F3E5F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4713E92B-D7FC-4B52-98BB-49F995F3E5F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4713E92B-D7FC-4B52-98BB-49F995F3E5F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4713E92B-D7FC-4B52-98BB-49F995F3E5F1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{93A84975-7179-47A1-BCD3-C9226B7A9A55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{93A84975-7179-47A1-BCD3-C9226B7A9A55}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{93A84975-7179-47A1-BCD3-C9226B7A9A55}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{93A84975-7179-47A1-BCD3-C9226B7A9A55}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B40A8105-7DBE-4003-827E-C95DDFAF95B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B40A8105-7DBE-4003-827E-C95DDFAF95B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B40A8105-7DBE-4003-827E-C95DDFAF95B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B40A8105-7DBE-4003-827E-C95DDFAF95B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{4713E92B-D7FC-4B52-98BB-49F995F3E5F1} = {66A96CF3-E9B9-40C0-A2A9-191B9BD016F0}
-		{93A84975-7179-47A1-BCD3-C9226B7A9A55} = {66A96CF3-E9B9-40C0-A2A9-191B9BD016F0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {18474C39-C73D-4A88-B353-9CDD43E0CC82}

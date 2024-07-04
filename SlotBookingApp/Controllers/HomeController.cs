@@ -1,12 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using SlotBookingApp.Models;
+using SlotBookingApp.Services;
 using System.Diagnostics;
-using SlotBookingApp.Domain.Entities;
-using SlotBookingApp.Infrastructure.Interfaces;
-using Newtonsoft.Json.Linq;
-
 
 namespace SlotBookingApp.Web.Controllers;
+
 
 public class HomeController : Controller
 {
@@ -48,7 +46,7 @@ public class HomeController : Controller
     }
 
     [HttpPost]
-    public IActionResult BookEvent([FromBody] CalendarEvent eventData)
+    public IActionResult BookEvent([FromBody] CalendarEventModel eventData)
     {
         try
         {
