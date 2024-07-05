@@ -36,14 +36,16 @@ public class BookingService : IBookingService
         return slotBooking;
     }
 
-    public async Task<bool> SendSlotBooking(CalendarEventModel eventData)
+    public async Task<ConfirmationViewModel> SendSlotBooking(CalendarEventModel eventData)
     {
         var slotBookingDto = await CreateBookingFromCalendarEvent(eventData);
-        bool isSent = await PostSlotBooking(slotBookingDto);
-        return isSent;      // TODO: improve response -> include statuscode, and evendata.Name, bookingtime
+        int statusCode = await PostSlotBooking(slotBookingDto);
+
+        var confirmation = new ConfirmationViewModel {confirmationName = eventData.Name, confirmationSlot = eventData.Start, confirmationStatus = statusCode.ToString()};
+        return confirmation;     
     }
 
-    private async Task<bool> PostSlotBooking(SlotBookingDto slotBookingDto)
+    private async Task<int> PostSlotBooking(SlotBookingDto slotBookingDto)
     {
         _logger.LogInformation($"PostSlotBooking call STARTED for {slotBookingDto.Start}");
 
@@ -61,12 +63,12 @@ public class BookingService : IBookingService
 
             _logger.LogInformation($"PostSlotBooking call COMPLETED for {slotBookingDto.Start}");
 
-            return true;
+            return (int)response.StatusCode;
         }
         catch (Exception ex)
         {
             _logger.LogError($"PostSlotBooking call ERROR: {ex.Message}");
-            return false;
+            return 500;
         }
     }
 

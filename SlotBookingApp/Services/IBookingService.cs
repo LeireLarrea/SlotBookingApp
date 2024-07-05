@@ -4,5 +4,5 @@ namespace SlotBookingApp.Services;
 
 public interface IBookingService
 {
-    Task<bool> SendSlotBooking(CalendarEventModel eventData);
+    Task<ConfirmationViewModel> SendSlotBooking(CalendarEventModel eventData);
 }

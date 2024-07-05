@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using SlotBookingApp.Models;
 using SlotBookingApp.Services;
 using System.Diagnostics;
@@ -46,19 +47,11 @@ public class HomeController : Controller
     }
 
     [HttpPost]
-    public IActionResult BookEvent([FromBody] CalendarEventModel eventData)
+    public async Task<IActionResult> BookEvent([FromBody] CalendarEventModel eventData)
     {
-        try
-        {
-            var isSent = _bookingHelper.SendSlotBooking( eventData);
-
-            return Ok(new { message = "Event booked successfully!" });
-        }
-        catch (Exception ex)
-        {
-            // Log the error or handle it appropriately
-            return StatusCode(500, new { message = $"Error: {ex.Message}" });
-        }
+        var bookingRequestResponse = await _bookingHelper.SendSlotBooking( eventData);
+        var testll = JsonConvert.SerializeObject(bookingRequestResponse);
+        return View(new ConfirmationViewModel { confirmationName = bookingRequestResponse.confirmationName, confirmationSlot = bookingRequestResponse.confirmationSlot, confirmationStatus = bookingRequestResponse.confirmationSlot });
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

@@ -1,0 +1,27 @@
+﻿@model ConfirmationViewModel
+@{
+    ViewData["Title"] = "Confirmation";
+}
+
+@if (Model.confirmationStatus == "200" || Model.confirmationStatus == "202")
+{
+    <div>
+        <h1 class="text-dark">Success</h1>
+        <p>An appointment has been successfully booked for @Model.confirmationName at @Model.confirmationSlot</p>
+    </div>
+    <div>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Close</a>
+    </div>
+}
+else
+{
+    <div>
+        <h1 class="text-danger">Oops!</h1>
+        <p>There was a problem booking your slot for @Model.confirmationName at @Model.confirmationSlot</p>
+        <p>We apologise for the inconvenience. Please close this page and try again</p>
+        <p>If the problem persist please call 1234567</p>
+    </div>
+    <div>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Close</a>
+    </div>
+}

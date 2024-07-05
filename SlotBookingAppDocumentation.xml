@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SlotBookingApp</name>
+    </assembly>
+    <members>
+        <member name="T:SlotBookingApp.Web.Controllers.HomeController">
+            <summary>
+            Controller for handling home-related actions.
+            </summary>
+        </member>
+        <member name="M:SlotBookingApp.Web.Controllers.HomeController.GetAvailableSlots(System.String)">
+            <summary>
+            Retrieves available slots for a given date.
+            </summary>
+            <param name="date">The date for which slots are requested.</param>
+            <returns>A JSON object containing available slots.</returns>
+        </member>
+    </members>
+</doc>
