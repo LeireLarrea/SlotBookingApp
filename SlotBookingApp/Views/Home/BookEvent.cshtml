@@ -1,4 +1,4 @@
-﻿@model ConfirmationViewModel
+﻿@model BookEventViewModel
 @{
     ViewData["Title"] = "Confirmation";
 }
@@ -17,9 +17,20 @@ else
 {
     <div>
         <h1 class="text-danger">Oops!</h1>
-        <p>There was a problem booking your slot for @Model.confirmationName at @Model.confirmationSlot</p>
+        <p>There was a problem booking your slot for  @Model.confirmationSlot</p>
+
+        @if(Model.Errors.Count > 0)
+        {
+            <p>Please try amend the following errors:</p>
+            <ul>
+                @foreach (var error in Model.Errors)
+                {
+                    <li>@error</li>
+                }
+            </ul>
+        }
         <p>We apologise for the inconvenience. Please close this page and try again</p>
-        <p>If the problem persist please call 1234567</p>
+        <p>If the problem persists please call 1234567</p>
     </div>
     <div>
         <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Close</a>

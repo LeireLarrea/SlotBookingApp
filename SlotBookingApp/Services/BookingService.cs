@@ -36,12 +36,12 @@ public class BookingService : IBookingService
         return slotBooking;
     }
 
-    public async Task<ConfirmationViewModel> SendSlotBooking(CalendarEventModel eventData)
+    public async Task<PostBookingConfirmation> SendSlotBooking(CalendarEventModel eventData)
     {
         var slotBookingDto = await CreateBookingFromCalendarEvent(eventData);
         int statusCode = await PostSlotBooking(slotBookingDto);
 
-        var confirmation = new ConfirmationViewModel {confirmationName = eventData.Name, confirmationSlot = eventData.Start, confirmationStatus = statusCode.ToString()};
+        var confirmation = new PostBookingConfirmation { Name = eventData.Name, Slot = eventData.Start, Status = statusCode.ToString()};
         return confirmation;     
     }
 

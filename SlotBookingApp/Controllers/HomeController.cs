@@ -49,9 +49,28 @@ public class HomeController : Controller
     [HttpPost]
     public async Task<IActionResult> BookEvent([FromBody] CalendarEventModel eventData)
     {
+        var validator = new CalendarEventModelValidator();
+        var validationResult = await validator.ValidateAsync(eventData);
+        if (!validationResult.IsValid)
+        {
+            var viewModelErrors = new BookEventViewModel
+            {
+                confirmationSlot = eventData.Start,
+                Errors = validationResult.Errors
+            };
+            return View("BookEvent", viewModelErrors);
+        }
+
         var bookingRequestResponse = await _bookingHelper.SendSlotBooking( eventData);
-        var testll = JsonConvert.SerializeObject(bookingRequestResponse);
-        return View(new ConfirmationViewModel { confirmationName = bookingRequestResponse.confirmationName, confirmationSlot = bookingRequestResponse.confirmationSlot, confirmationStatus = bookingRequestResponse.confirmationSlot });
+
+        var viewModel = new BookEventViewModel
+        {
+            confirmationName = bookingRequestResponse.Name,
+            confirmationSlot = bookingRequestResponse.Slot,
+            confirmationStatus = bookingRequestResponse.Status
+        };
+
+        return View("BookEvent", viewModel);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

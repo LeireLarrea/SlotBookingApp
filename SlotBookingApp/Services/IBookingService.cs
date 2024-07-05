@@ -1,8 +1,9 @@
-﻿using SlotBookingApp.Models;
+﻿using SlotBookingApp.Infrastructure.Dtos;
+using SlotBookingApp.Models;
 
 namespace SlotBookingApp.Services;
 
 public interface IBookingService
 {
-    Task<ConfirmationViewModel> SendSlotBooking(CalendarEventModel eventData);
+    Task<PostBookingConfirmation> SendSlotBooking(CalendarEventModel eventData);
 }

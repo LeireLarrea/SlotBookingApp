@@ -1,3 +1,5 @@
+using FluentValidation.AspNetCore;
+using Microsoft.OpenApi.Models;
 using SlotBookingApp.Helpers;
 using SlotBookingApp.Services;
 
@@ -7,6 +9,8 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();  
 builder.Logging.AddDebug();
 
+
+// services
 var configuration = builder.Configuration;
 builder.Services.AddSingleton<IConfiguration>(configuration);
 
@@ -25,8 +29,16 @@ builder.Services.AddControllersWithViews()
     {
         options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
         options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
-    });
+    })
+    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<Program>());
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "SlotBookingApp", Version = "v1" });
+});
+
+// app
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -41,5 +53,12 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "SlotBookingApp v1");
+});
+
 
 app.Run();
