@@ -17,6 +17,37 @@ This application follows the MVC software design pattern.
 It interacts with a ScheduleService to get the weekly availability
 and with the BookingService to book the desired slots.
 
+## GetAvailableSlots(string date)
+Sample requests:
+from the UI: GET /home/GetAvailableSlots?date=2024-07-15
+from swager: GET GetAvailableSlots   Date: 2024-07-15
+
+## BookEvent([FromBody] CalendarEventModel eventData)
+Sample request from swagger:
+from the UI: POST '/home/BookEvent'
+	{
+	  "start": "2024-07-12T08:40:00+01:00",
+	  "end": "2024-07-12T08:50:00+01:00",
+	  "name": "YourName",
+	  "secondName": "YourSurname",
+	  "email": "email@email.com",
+	  "phone": "12345678901",
+	  "comments": "I just like doctors",
+	  "facilityId": "7960f43f-67dc-4bc5-a52b-9a3494306749"
+	}
+from swagger: POST 'api/swagger/book-event'
+	{
+	  "start": "2024-07-12T08:40:00+01:00",
+	  "end": "2024-07-12T08:50:00+01:00",
+	  "name": "YourName",
+	  "secondName": "YourSurname",
+	  "email": "email@email.com",
+	  "phone": "12345678901",
+	  "comments": "I just like doctors",
+	  "facilityId": "7960f43f-67dc-4bc5-a52b-9a3494306749"
+	}
+
+
 ## Release Notes
 ### 2024-05-07
 This is a very simple PoC that separates the third party calls from the frontend

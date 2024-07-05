@@ -4,7 +4,7 @@ using SlotBookingApp.Models;
 using SlotBookingApp.Services;
 using System.Diagnostics;
 
-namespace SlotBookingApp.Web.Controllers;
+namespace SlotBookingApp.Controllers;
 
 
 public class HomeController : Controller
