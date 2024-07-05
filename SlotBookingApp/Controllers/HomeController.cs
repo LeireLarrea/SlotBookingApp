@@ -47,32 +47,27 @@ public class HomeController : Controller
         }
     }
 
-    [HttpPost]
+   [HttpPost]
     public async Task<IActionResult> BookEvent([FromBody] CalendarEventModel eventData)
     {
         var validator = new CalendarEventModelValidator();
         var validationResult = await validator.ValidateAsync(eventData);
+
         if (!validationResult.IsValid)
         {
-            var viewModelErrors = new BookEventViewModel
-            {
-                confirmationSlot = eventData.Start,
-                Errors = validationResult.Errors
-            };
-            return View("BookEvent", viewModelErrors);
+            return BadRequest(validationResult.Errors);
         }
 
-        var bookingRequestResponse = await _bookingHelper.SendSlotBooking( eventData);
+        var bookingRequestResponse = await _bookingHelper.SendSlotBooking(eventData);
 
-        var viewModel = new BookEventViewModel
+        if (bookingRequestResponse.Status == "500")
         {
-            confirmationName = bookingRequestResponse.Name,
-            confirmationSlot = bookingRequestResponse.Slot,
-            confirmationStatus = bookingRequestResponse.Status
-        };
+            return BadRequest("Error occurred while booking event.");
+        }
 
-        return View("BookEvent", viewModel);
+        return Ok(bookingRequestResponse);
     }
+
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

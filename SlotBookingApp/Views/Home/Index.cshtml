@@ -13,7 +13,10 @@
     </style>
 </head>
 <body>
+    @* calendar *@
     <div id='calendar'></div>
+
+    @* Booking Modal *@
     <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -25,29 +28,47 @@
                     <form id="eventForm">
                         <div class="mb-3">
                             <label for="comments" class="form-label">Comments</label>
-                            <textarea class="form-control" id="comments" name="comments" rows="3" required></textarea>
+                            <textarea class="form-control" id="comments" name="comments" rows="3" ></textarea>
                         </div>
                         <div class="mb-3">
                             <label for="name" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
+                            <input type="text" class="form-control" id="name" name="name" >
                         </div>
                         <div class="mb-3">
                             <label for="secondName" class="form-label">Second Name</label>
-                            <input type="text" class="form-control" id="secondName" name="secondName" required>
+                            <input type="text" class="form-control" id="secondName" name="secondName" >
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
+                            <input type="email" class="form-control" id="email" name="email" >
                         </div>
                         <div class="mb-3">
                             <label for="phone" class="form-label">Phone</label>
-                            <input type="text" class="form-control" id="phone" name="phone" required>
+                            <input type="text" class="form-control" id="phone" name="phone" >
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" id="BookEvent">Book</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Booking confirmation modal *@
+    <div id="responseModal" class="modal fade" tabindex="-1" aria-labelledby="responseModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="responseModalLabel">Response Message</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="responseMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -131,6 +152,10 @@
             }
 
             function submitEventData(eventData) {
+                if (!eventData.comments || !eventData.name || !eventData.secondName || !eventData.email || !eventData.phone) {
+                    openResponseModal('Please fill in Comments, Name, SecondName, Email and Phone');
+                    return; 
+                }
                 fetch('/home/BookEvent', {
                     method: 'POST',
                     headers: {
@@ -138,13 +163,30 @@
                     },
                     body: JSON.stringify(eventData)
                 })
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Ooops there was a problem with the booking');
+                        }
+                        return response.json();
+                    })
                     .then(data => {
-                        console.log('Event data Bookd:', data);
+                        console.log(' booked:', data);
+                        openResponseModal('Your slot has been booked successfully!');
                     })
                     .catch(error => {
                         console.error('Error saving event:', error);
+                        openResponseModal(error.message);
                     });
+            }
+
+            function openResponseModal(message) {
+                var modal = new bootstrap.Modal(document.getElementById('responseModal'), {
+                    backdrop: 'static',
+                    keyboard: false
+                });
+                var modalMessage = document.getElementById('responseMessage');
+                modalMessage.textContent = message;
+                modal.show();
             }
 
             function adjustCalendarHeight(calendar) {
