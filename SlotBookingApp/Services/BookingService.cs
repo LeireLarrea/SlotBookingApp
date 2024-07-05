@@ -1,22 +1,20 @@
 ﻿using Newtonsoft.Json;
+using SlotBookingApp.Helpers;
 using SlotBookingApp.Infrastructure.Dtos;
 using SlotBookingApp.Models;
-using System.Net.Http.Headers;
 using System.Text;
 
 namespace SlotBookingApp.Services;
 
 public class BookingService : IBookingService
 {
-    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<BookingService> _logger;
-    private readonly IConfiguration _configuration;
+    private readonly HttpClientHelper _httpClientHelper;
 
-    public BookingService(IHttpClientFactory httpClientFactory, ILogger<BookingService> logger, IConfiguration configuration)
+    public BookingService(ILogger<BookingService> logger, HttpClientHelper httpClientHelper)
     {
-        _httpClientFactory = httpClientFactory;
         _logger = logger;
-        _configuration = configuration;
+        _httpClientHelper = httpClientHelper;
     }
 
 
@@ -54,11 +52,8 @@ public class BookingService : IBookingService
             var json = JsonConvert.SerializeObject(slotBookingDto);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var client = _httpClientFactory.CreateClient("ExternalApi");
-            var authHeaderValue = GetAuthHeaderValue();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authHeaderValue);
-
-            var response = await client.PostAsync("availability/TakeSlot", content);
+            var httpClient = _httpClientHelper.GetClient();
+            var response = await httpClient.PostAsync("availability/TakeSlot", content);
             response.EnsureSuccessStatusCode();
 
             _logger.LogInformation($"PostSlotBooking call COMPLETED for {slotBookingDto.Start}");
@@ -70,12 +65,5 @@ public class BookingService : IBookingService
             _logger.LogError($"PostSlotBooking call ERROR: {ex.Message}");
             return 500;
         }
-    }
-
-    private string GetAuthHeaderValue()
-    {
-        var username = _configuration["ApiCredentials:Username"];
-        var password = _configuration["ApiCredentials:Password"];
-        return Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}"));
     }
 }

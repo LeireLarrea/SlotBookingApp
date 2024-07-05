@@ -1,29 +1,25 @@
-﻿using Newtonsoft.Json;
-using SlotBookingApp.Helpers;
+﻿using SlotBookingApp.Helpers;
 using SlotBookingApp.Infrastructure.Dtos;
-using System.Net.Http.Headers;
-using System.Text;
 
 
 namespace SlotBookingApp.Services;
 
 public class ScheduleService : IScheduleService
 {
-    private readonly HttpClient _httpClient;
     private readonly ILogger<ScheduleService> _logger;
     private readonly DateHelper _dateHelper;
     private readonly SlotsHelper _slotsHelper;
+    private readonly HttpClientHelper _httpClientHelper;
+    private readonly string _getWeeklyAvailabilitypathURL = "availability/GetWeeklyAvailability/";
 
 
-    public ScheduleService(IHttpClientFactory httpClientFactory, DateHelper dateHelper, SlotsHelper slotsHelper, ILogger<ScheduleService> logger)
+    public ScheduleService(DateHelper dateHelper, SlotsHelper slotsHelper, 
+        ILogger<ScheduleService> logger, HttpClientHelper httpClientHelper)
     {
-        _httpClient = httpClientFactory.CreateClient("ExternalApi");
-        var authToken = Convert.ToBase64String(Encoding.ASCII.GetBytes("techuser:secretpassWord"));
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authToken);
-
         _dateHelper = dateHelper;
         _slotsHelper = slotsHelper;
         _logger = logger;
+        _httpClientHelper = httpClientHelper;
     }
 
     public async Task<ScheduleData> GetSchedule(string date)
@@ -32,10 +28,12 @@ public class ScheduleService : IScheduleService
 
         try
         {
-            var scheduleDataRespose = await _httpClient.GetAsync($"availability/GetWeeklyAvailability/{_dateHelper.GetWeeksMonday(date).ToString("yyyyMMdd")}");
+            var httpClient = _httpClientHelper.GetClient();
+            var scheduleDataRespose = await httpClient.GetAsync($"{_getWeeklyAvailabilitypathURL}{_dateHelper.GetWeeksMonday(date).ToString("yyyyMMdd")}");
             scheduleDataRespose.EnsureSuccessStatusCode();
 
             var weeklySchedule = await scheduleDataRespose.Content.ReadFromJsonAsync<ScheduleData>();
+
             _logger.LogInformation($"GetSchedule call COMPLETED for date: {date}");
             
             return weeklySchedule;
@@ -52,7 +50,6 @@ public class ScheduleService : IScheduleService
         List<string> allSlots =  await _slotsHelper.GetAllSlots(scheduleData, date);
         List<string> busySlots = await _slotsHelper.GetBusySlots(scheduleData);
         List<string> availableSlots = allSlots.Except(busySlots).ToList();
-        var testll = JsonConvert.SerializeObject(availableSlots);
         var calendarEvents = _slotsHelper.FormatCalendarEventsForFullCalendar(availableSlots);
         return calendarEvents;
     } 

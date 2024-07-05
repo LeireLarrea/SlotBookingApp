@@ -18,11 +18,9 @@ builder.Services.AddScoped<IScheduleService, ScheduleService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<DateHelper>();
 builder.Services.AddScoped<SlotsHelper>();
+builder.Services.AddScoped<HttpClientHelper>();
 
-builder.Services.AddHttpClient("ExternalApi", client =>
-{
-    client.BaseAddress = new Uri("https://draliatest.azurewebsites.net/api/");
-});
+builder.Services.AddHttpClient();
 
 builder.Services.AddControllersWithViews()
     .AddNewtonsoftJson(options =>
