@@ -1,9 +1,9 @@
 ﻿using SlotBookingApp.Infrastructure.Dtos;
 
-namespace SlotBookingApp.Services;
+namespace SlotBookingApp.Infrastructure.Services;
 
 public interface IScheduleService
 {
-    Task<List<Object>> GetAvailableSlots(ScheduleData scheduleData, string date);
+    Task<List<object>> GetAvailableSlots(ScheduleData scheduleData, string date);
     Task<ScheduleData> GetSchedule(string date);
 }

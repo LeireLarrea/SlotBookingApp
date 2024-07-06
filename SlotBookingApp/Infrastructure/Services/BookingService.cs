@@ -4,7 +4,7 @@ using SlotBookingApp.Infrastructure.Dtos;
 using SlotBookingApp.Models;
 using System.Text;
 
-namespace SlotBookingApp.Services;
+namespace SlotBookingApp.Infrastructure.Services;
 
 public class BookingService : IBookingService
 {
@@ -34,13 +34,19 @@ public class BookingService : IBookingService
         return slotBooking;
     }
 
-    public async Task<PostBookingConfirmation> SendSlotBooking(CalendarEventModel eventData)
+    /// <summary>
+    /// POSTS a slot booking request using the provided event data.
+    /// </summary>
+    /// <param name="eventData">The calendar event data for slot booking.</param>
+    /// <returns>A PostBookingConfirmationDto indicating is the http code of the POST request.</returns>
+
+    public async Task<PostBookingConfirmationDto> SendSlotBooking(CalendarEventModel eventData)
     {
         var slotBookingDto = await CreateBookingFromCalendarEvent(eventData);
         int statusCode = await PostSlotBooking(slotBookingDto);
 
-        var confirmation = new PostBookingConfirmation { Name = eventData.Name, Slot = eventData.Start, Status = statusCode.ToString()};
-        return confirmation;     
+        var confirmation = new PostBookingConfirmationDto { Name = eventData.Name, Slot = eventData.Start, Status = statusCode.ToString() };
+        return confirmation;
     }
 
     private async Task<int> PostSlotBooking(SlotBookingDto slotBookingDto)

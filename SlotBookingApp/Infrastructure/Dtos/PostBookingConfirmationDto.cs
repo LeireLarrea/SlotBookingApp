@@ -1,6 +1,6 @@
 ﻿namespace SlotBookingApp.Infrastructure.Dtos;
 
-public class PostBookingConfirmation
+public class PostBookingConfirmationDto
 {
     public string Name { get; set; }
     public string Slot { get; set; }

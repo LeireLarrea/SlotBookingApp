@@ -3,8 +3,17 @@ using System.Text.RegularExpressions;
 
 namespace SlotBookingApp.Helpers;
 
+/// <summary>
+/// Helper class for date and time related operations.
+/// </summary>
 public class DateHelper
 {
+    /// <summary>
+    /// Gets the Monday date of the week for a given input string date.
+    /// </summary>
+    /// <param name="inputString">The input date string in the format "yyyy-MM-dd".</param>
+    /// <returns>The DateTime object representing the Monday date of the week.</returns>
+    /// <exception cref="FormatException">Thrown when the inputString is not in the correct format.</exception>
     public DateTime GetWeeksMonday(string inputString)
     {
         string pattern = @"^(\d{4})-(\d{2})-(\d{2}).*";
@@ -16,6 +25,14 @@ public class DateHelper
         return monday;
     }
 
+    /// <summary>
+    /// Generates a list of time intervals between start and end times with the specified interval in minutes.
+    /// </summary>
+    /// <param name="start">The start time of the interval.</param>
+    /// <param name="end">The end time of the interval.</param>
+    /// <param name="intervalMinutes">The interval in minutes between each time slot.</param>
+    /// <returns>A list of strings representing time intervals.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the intervalMinutes is less than or equal to 0.</exception>
     public List<string> GenerateTimeList(DateTime start, DateTime end, int intervalMinutes)
     {
         List<string> result = new List<string>();

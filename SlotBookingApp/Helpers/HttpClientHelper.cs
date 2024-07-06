@@ -3,6 +3,9 @@ using System.Text;
 
 namespace SlotBookingApp.Helpers;
 
+/// <summary>
+/// Helper class for managing HttpClient instances with basic authentication.
+/// </summary>
 public class HttpClientHelper
 {
     private readonly IHttpClientFactory _httpClientFactory;
@@ -16,6 +19,7 @@ public class HttpClientHelper
         InitializeClient();
     }
 
+
     private void InitializeClient()
     {
         _client = _httpClientFactory.CreateClient();
@@ -25,6 +29,10 @@ public class HttpClientHelper
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authHeaderValue);
     }
 
+    /// <summary>
+    /// Initializes and retrieves a HttpClient instance with base URL and basic authentication header.
+    /// </summary>
+    /// <returns>The configured HttpClient instance.</returns>
     public HttpClient GetClient()
     {
         return _client;

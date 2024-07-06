@@ -1,0 +1,140 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SlotBookingApp</name>
+    </assembly>
+    <members>
+        <member name="T:SlotBookingApp.Controllers.HomeController">
+            <summary>
+            Controller for handling calendar page and slot booking operations.
+            </summary>
+        </member>
+        <member name="M:SlotBookingApp.Controllers.HomeController.GetAvailableSlots(System.String)">
+            <summary>
+            Retrieves available slots for the specified week based on a date of that week
+            </summary>
+            <param name="date">The date for which slots are requested.</param>
+            <returns>JSON response containing available slots.</returns>
+        </member>
+        <member name="M:SlotBookingApp.Controllers.HomeController.BookEvent(SlotBookingApp.Models.CalendarEventModel)">
+            <summary>
+            Books an event/slot using the selected event data.
+            </summary>
+            <param name="eventData">The event data to book.</param>
+            <returns>Action result indicating success or failure of the booking operation.</returns>
+        </member>
+        <member name="T:SlotBookingApp.Helpers.DateHelper">
+            <summary>
+            Helper class for date and time related operations.
+            </summary>
+        </member>
+        <member name="M:SlotBookingApp.Helpers.DateHelper.GetWeeksMonday(System.String)">
+            <summary>
+            Gets the Monday date of the week for a given input string date.
+            </summary>
+            <param name="inputString">The input date string in the format "yyyy-MM-dd".</param>
+            <returns>The DateTime object representing the Monday date of the week.</returns>
+            <exception cref="T:System.FormatException">Thrown when the inputString is not in the correct format.</exception>
+        </member>
+        <member name="M:SlotBookingApp.Helpers.DateHelper.GenerateTimeList(System.DateTime,System.DateTime,System.Int32)">
+            <summary>
+            Generates a list of time intervals between start and end times with the specified interval in minutes.
+            </summary>
+            <param name="start">The start time of the interval.</param>
+            <param name="end">The end time of the interval.</param>
+            <param name="intervalMinutes">The interval in minutes between each time slot.</param>
+            <returns>A list of strings representing time intervals.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when the intervalMinutes is less than or equal to 0.</exception>
+        </member>
+        <member name="T:SlotBookingApp.Helpers.HttpClientHelper">
+            <summary>
+            Helper class for managing HttpClient instances with basic authentication.
+            </summary>
+        </member>
+        <member name="M:SlotBookingApp.Helpers.HttpClientHelper.GetClient">
+            <summary>
+            Initializes and retrieves a HttpClient instance with base URL and basic authentication header.
+            </summary>
+            <returns>The configured HttpClient instance.</returns>
+        </member>
+        <member name="T:SlotBookingApp.Helpers.SlotsHelper">
+            <summary>
+            Helper class for managing slots and calendar events.
+            </summary>
+        </member>
+        <member name="M:SlotBookingApp.Helpers.SlotsHelper.GetAllSlots(SlotBookingApp.Infrastructure.Dtos.ScheduleData,System.String)">
+            <summary>
+            Retrieves all available slots for the specified schedule based on WorkPeriod data and SlotDurationMinutes
+            </summary>
+            <param name="scheduleData">The schedule data.</param>
+            <param name="date">The date in "yyyy-MM-dd" format for which slots are requested.</param>
+            <returns>A list of strings representing all available slots.</returns>
+        </member>
+        <member name="M:SlotBookingApp.Helpers.SlotsHelper.GetBusySlots(SlotBookingApp.Infrastructure.Dtos.ScheduleData)">
+            <summary>
+            Retrieves busy slots from the schedule data.
+            </summary>
+            <param name="scheduleData">The schedule data.</param>
+            <returns>A list of strings of the busy slots.</returns>
+        </member>
+        <member name="M:SlotBookingApp.Infrastructure.Services.BookingService.SendSlotBooking(SlotBookingApp.Models.CalendarEventModel)">
+            <summary>
+            POSTS a slot booking request using the provided event data.
+            </summary>
+            <param name="eventData">The calendar event data for slot booking.</param>
+            <returns>A PostBookingConfirmationDto indicating is the http code of the POST request.</returns>
+        </member>
+        <member name="M:SlotBookingApp.Infrastructure.Services.ScheduleService.GetSchedule(System.String)">
+            <summary>
+            Retrieves the weekly schedule data based on any provided date for such week.
+            </summary>
+            <param name="date">The date for which the weekly schedule is requested.</param>
+            <returns>The schedule data for the specified week.</returns>
+        </member>
+        <member name="M:SlotBookingApp.Infrastructure.Services.ScheduleService.GetAvailableSlots(SlotBookingApp.Infrastructure.Dtos.ScheduleData,System.String)">
+            <summary>
+            Calculates the available slots based on the provided schedule data and date.
+            </summary>
+            <param name="scheduleData">The schedule data for the week.</param>
+            <param name="date">The day for which the weekly available slots are requested.</param>
+            <returns>A list of calendar events representing available slots formatted for FullCalendar.</returns>
+        </member>
+        <member name="M:SlotBookingApp.Swagger.SwaggerUtility.GetAvailableSlots(System.String)">
+            <summary>
+            A utility controller to allow Swagger access the HomeController.GetAvailableSlots() GET method without breaking the HomeController's MVC binding.
+            Retrieves available slots for the specified week based on a date of that week
+            </summary>
+            <remarks>
+            Sample request:
+                GET /api/swagger/available-slots/2024-07-15
+                {
+                }
+            </remarks>
+            <param name="date">The date for which slots are requested (format: yyyy-MM-dd).</param>
+            <returns>A list of available slots.</returns>
+        </member>
+        <member name="M:SlotBookingApp.Swagger.SwaggerUtility.BookEvent(SlotBookingApp.Models.CalendarEventModel)">
+            <summary>
+            A utility controller to allow Swagger access the HomeController.BookEvent() POST method without breaking the HomeController's MVC binding.
+            Books an event/slot using the selected event data.
+            </summary>
+            <remarks>
+            Sample request:
+                POST api/swagger/book-event
+                {
+                    "start": "2024-07-12T08:40:00+01:00",
+                    "end": "2024-07-12T08:50:00+01:00",
+                    "name": "YourName",
+                    "secondName": "YourSurname",
+                    "email": "email@email.com",
+                    "phone": "12345678901",
+                    "comments": "I just like doctors",
+                    "facilityId": "7960f43f-67dc-4bc5-a52b-9a3494306749"
+                }
+                
+            </remarks>
+            <param name="eventData">The event data for booking (required).</param>
+            <returns>The result of the booking operation.</returns>
+        </member>
+    </members>
+</doc>

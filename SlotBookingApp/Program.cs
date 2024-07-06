@@ -1,7 +1,7 @@
 using FluentValidation.AspNetCore;
 using Microsoft.OpenApi.Models;
 using SlotBookingApp.Helpers;
-using SlotBookingApp.Services;
+using SlotBookingApp.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

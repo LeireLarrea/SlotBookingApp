@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+
 namespace SlotBookingApp.Models;
 
 public class CalendarEventModelValidator : AbstractValidator<CalendarEventModel>
@@ -32,11 +33,6 @@ public class CalendarEventModelValidator : AbstractValidator<CalendarEventModel>
     }
 
     private bool BeAValidPhoneNumber(string phoneNumber)
-    {
-        return phoneNumber.All(char.IsDigit) && phoneNumber.Length >= 11 && phoneNumber.Length <= 15;
-    }
-
-    private bool BeAValidNameOrComment(string phoneNumber)
     {
         return phoneNumber.All(char.IsDigit) && phoneNumber.Length >= 11 && phoneNumber.Length <= 15;
     }

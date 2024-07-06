@@ -3,6 +3,9 @@ using System.Globalization;
 
 namespace SlotBookingApp.Helpers;
 
+/// <summary>
+/// Helper class for managing slots and calendar events.
+/// </summary>
 public class SlotsHelper
 {
     private readonly DateHelper _dateHelper;
@@ -11,6 +14,12 @@ public class SlotsHelper
         _dateHelper = dateHelper;
     }
 
+    /// <summary>
+    /// Retrieves all available slots for the specified schedule based on WorkPeriod data and SlotDurationMinutes
+    /// </summary>
+    /// <param name="scheduleData">The schedule data.</param>
+    /// <param name="date">The date in "yyyy-MM-dd" format for which slots are requested.</param>
+    /// <returns>A list of strings representing all available slots.</returns>
     public async Task<List<string>> GetAllSlots(ScheduleData scheduleData, string date)
     {
         var monday = _dateHelper.GetWeeksMonday(date);
@@ -40,7 +49,7 @@ public class SlotsHelper
         return allSlots;
     }
 
-    public List<string> GetSlotsInPeriod(int startTime, int endTime, int slotDuration, DateTime date)
+    private List<string> GetSlotsInPeriod(int startTime, int endTime, int slotDuration, DateTime date)
     {
         DateTime startHourTime = date.Date.AddHours(startTime);
         DateTime lunchStartHourTime = date.Date.AddHours(endTime);
@@ -50,11 +59,18 @@ public class SlotsHelper
         return periodSlots;
     }
 
+    /// <summary>
+    /// Retrieves busy slots from the schedule data.
+    /// </summary>
+    /// <param name="scheduleData">The schedule data.</param>
+    /// <returns>A list of strings of the busy slots.</returns>
     public async Task<List<string>> GetBusySlots(ScheduleData scheduleData)
     {
         var formattedSlots = new List<string>();
 
-        Parallel.ForEach(new[] { scheduleData.Monday, scheduleData.Tuesday, scheduleData.Wednesday, scheduleData.Friday },
+        Parallel.ForEach(new[] { scheduleData.Monday, scheduleData.Tuesday, scheduleData.Wednesday,
+                                   scheduleData.Thursday, scheduleData.Friday, scheduleData.Saturday,
+                                   scheduleData.Sunday },
             (daySchedule) =>
             {
                 if (daySchedule != null && daySchedule.BusySlots != null)
