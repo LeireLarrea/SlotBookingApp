@@ -30,7 +30,6 @@ public class HomeController : Controller
     {
         try
         {
-            date = "2024-07-09";
             var scheduleData = await _scheduleService.GetSchedule(date);
             var availableSlots = await _scheduleService.GetAvailableSlots(scheduleData, date);
             
