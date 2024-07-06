@@ -167,7 +167,10 @@
                 })
                     .then(response => {
                         if (!response.ok) {
-                            throw new Error('Ooops there was a problem with the booking');
+                            return response.json().then(errorData => {
+                                const errorMessages = errorData.map(error => error.errorMessage).join('; \n');
+                                throw new Error(`Some of your inputs are invalid, please update these:\n${errorMessages}`);
+                            });
                         }
                         return response.json();
                     })
@@ -176,7 +179,7 @@
                         openResponseModal('Your slot has been booked successfully!');
                     })
                     .catch(error => {
-                        console.error('Error saving event:', error);
+                        console.error('Ooops there was a problem with the booking:', error);
                         openResponseModal(error.message);
                     });
             }
