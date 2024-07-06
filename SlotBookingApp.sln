@@ -5,6 +5,8 @@ VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SlotBookingApp", "SlotBookingApp\SlotBookingApp.csproj", "{F8E58B3D-438D-4C6D-85D3-5977AEAFB3B5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlotBookingApp.Tests", "SlotBookingApp.Tests\SlotBookingApp.Tests.csproj", "{A4FFBED5-2C94-486C-83B0-25D6A2DD2192}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{F8E58B3D-438D-4C6D-85D3-5977AEAFB3B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8E58B3D-438D-4C6D-85D3-5977AEAFB3B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F8E58B3D-438D-4C6D-85D3-5977AEAFB3B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4FFBED5-2C94-486C-83B0-25D6A2DD2192}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4FFBED5-2C94-486C-83B0-25D6A2DD2192}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4FFBED5-2C94-486C-83B0-25D6A2DD2192}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4FFBED5-2C94-486C-83B0-25D6A2DD2192}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
