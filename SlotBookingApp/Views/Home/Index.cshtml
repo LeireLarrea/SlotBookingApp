@@ -170,6 +170,7 @@
                             return response.json().then(errorData => {
                                 const errorMessages = errorData.map(error => error.errorMessage).join('; \n');
                                 throw new Error(`Some of your inputs are invalid, please update these:\n${errorMessages}`);
+                                location.reload();
                             });
                         }
                         return response.json();
@@ -177,10 +178,12 @@
                     .then(data => {
                         console.log(' booked:', data);
                         openResponseModal('Your slot has been booked successfully!');
+                        location.reload();
                     })
                     .catch(error => {
                         console.error('Ooops there was a problem with the booking:', error);
                         openResponseModal(error.message);
+                        location.reload();
                     });
             }
 
