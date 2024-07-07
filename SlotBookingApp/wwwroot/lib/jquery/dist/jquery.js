@@ -122,7 +122,7 @@ var document = window.document;
 				// See https://github.com/whatwg/html/issues/2369
 				// See https://html.spec.whatwg.org/#nonce-attributes
 				// The `node.getAttribute` check was added for the sake of
-				// `jQuery.globalEval` so that it can fake a nonce-containing node
+				// `jQuery.globalEval` so that it can Test a nonce-containing node
 				// via an object.
 				val = node[ i ] || node.getAttribute && node.getAttribute( i );
 				if ( val ) {
@@ -6778,7 +6778,7 @@ function getWidthOrHeight( elem, dimension, extra ) {
 	var styles = getStyles( elem ),
 
 		// To avoid forcing a reflow, only fetch boxSizing if we need it (gh-4322).
-		// Fake content-box until we know it's needed to know the true value.
+		// Test content-box until we know it's needed to know the true value.
 		boxSizingNeeded = !support.boxSizingReliable() || extra,
 		isBorderBox = boxSizingNeeded &&
 			jQuery.css( elem, "boxSizing", false, styles ) === "border-box",
@@ -9439,7 +9439,7 @@ jQuery.extend( {
 			// Default abort message
 			strAbort = "canceled",
 
-			// Fake xhr
+			// Test xhr
 			jqXHR = {
 				readyState: 0,
 
@@ -9787,7 +9787,7 @@ jQuery.extend( {
 				}
 			}
 
-			// Set data for the fake xhr object
+			// Set data for the Test xhr object
 			jqXHR.status = status;
 			jqXHR.statusText = ( nativeStatusText || statusText ) + "";
 

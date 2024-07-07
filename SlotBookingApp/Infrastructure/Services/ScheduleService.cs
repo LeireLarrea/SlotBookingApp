@@ -1,5 +1,7 @@
-﻿using SlotBookingApp.Helpers;
+﻿using Newtonsoft.Json;
+using SlotBookingApp.Helpers;
 using SlotBookingApp.Infrastructure.Dtos;
+using System.Net.Http.Headers;
 
 
 namespace SlotBookingApp.Infrastructure.Services;
@@ -7,19 +9,30 @@ namespace SlotBookingApp.Infrastructure.Services;
 public class ScheduleService : IScheduleService
 {
     private readonly ILogger<ScheduleService> _logger;
+    private readonly IConfiguration _configuration;
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly HttpClient _client;
+
     private readonly DateHelper _dateHelper;
     private readonly SlotsHelper _slotsHelper;
-    private readonly HttpClientHelper _httpClientHelper;
+    private readonly HttpHelper _httpHelper;
     private readonly string _getWeeklyAvailabilitypathURL = "availability/GetWeeklyAvailability/";
 
-
-    public ScheduleService(DateHelper dateHelper, SlotsHelper slotsHelper,
-        ILogger<ScheduleService> logger, HttpClientHelper httpClientHelper)
+    public ScheduleService(ILogger<ScheduleService> logger, IConfiguration configuration, IHttpClientFactory httpClientFactory, 
+        DateHelper dateHelper, SlotsHelper slotsHelper, HttpHelper httpHelper)
     {
+        _logger = logger;
+        _configuration = configuration;
+
+        _httpClientFactory = httpClientFactory;
+        _client = _httpClientFactory.CreateClient();
+        _client.BaseAddress = new Uri(_configuration["DraliatestSettings:BaseUrl"]);
+
         _dateHelper = dateHelper;
         _slotsHelper = slotsHelper;
-        _logger = logger;
-        _httpClientHelper = httpClientHelper;
+        _httpHelper = httpHelper;
+        var authHeaderValue = _httpHelper.GetAuthHeaderValue();
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authHeaderValue);
     }
 
     /// <summary>
@@ -33,8 +46,7 @@ public class ScheduleService : IScheduleService
 
         try
         {
-            var httpClient = _httpClientHelper.GetClient();
-            var scheduleDataRespose = await httpClient.GetAsync($"{_getWeeklyAvailabilitypathURL}{_dateHelper.GetWeeksMonday(date).ToString("yyyyMMdd")}");
+            var scheduleDataRespose = await _client.GetAsync($"{_getWeeklyAvailabilitypathURL}{_dateHelper.GetWeeksMonday(date).ToString("yyyyMMdd")}");
             scheduleDataRespose.EnsureSuccessStatusCode();
 
             var weeklySchedule = await scheduleDataRespose.Content.ReadFromJsonAsync<ScheduleData>();

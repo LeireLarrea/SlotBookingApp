@@ -736,7 +736,7 @@ $.extend( $.validator, {
 			if ( type === "file" ) {
 
 				// Modern browser (chrome & safari)
-				if ( val.substr( 0, 12 ) === "C:\\fakepath\\" ) {
+				if ( val.substr( 0, 12 ) === "C:\\Testpath\\" ) {
 					return val.substr( 12 );
 				}
 

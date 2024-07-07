@@ -18,7 +18,7 @@ builder.Services.AddScoped<IScheduleService, ScheduleService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<DateHelper>();
 builder.Services.AddScoped<SlotsHelper>();
-builder.Services.AddScoped<HttpClientHelper>();
+builder.Services.AddScoped<HttpHelper>();
 
 builder.Services.AddHttpClient();
 

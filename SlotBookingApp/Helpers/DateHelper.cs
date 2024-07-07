@@ -1,5 +1,7 @@
-﻿using System.Globalization;
+﻿using SlotBookingApp.Infrastructure.Dtos;
+using System.Globalization;
 using System.Text.RegularExpressions;
+
 
 namespace SlotBookingApp.Helpers;
 
@@ -16,6 +18,11 @@ public class DateHelper
     /// <exception cref="FormatException">Thrown when the inputString is not in the correct format.</exception>
     public DateTime GetWeeksMonday(string inputString)
     {
+        if (!DateTime.TryParseExact(inputString, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date))
+        {
+            throw new FormatException($"The date '{inputString}' should be in the following format: yyyy-MM-dd");
+        }
+
         string pattern = @"^(\d{4})-(\d{2})-(\d{2}).*";
         string formattedDate = Regex.Replace(inputString, pattern, "$1/$2/$3");
 
@@ -35,14 +42,21 @@ public class DateHelper
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the intervalMinutes is less than or equal to 0.</exception>
     public List<string> GenerateTimeList(DateTime start, DateTime end, int intervalMinutes)
     {
-        List<string> result = new List<string>();
-
-        DateTime current = start;
-        while (current < end && current > DateTime.Now)
+        try
         {
-            result.Add($"{current} - {current.AddMinutes(intervalMinutes)}");
-            current = current.AddMinutes(intervalMinutes);
+            List<string> result = new List<string>();
+
+            DateTime current = start;
+            while (current < end && current > DateTime.Now)
+            {
+                result.Add($"{current} - {current.AddMinutes(intervalMinutes)}");
+                current = current.AddMinutes(intervalMinutes);
+            }
+            return result;
         }
-        return result;
+        catch (Exception ex)
+        {
+            return new List<string>();
+        }
     }
 }

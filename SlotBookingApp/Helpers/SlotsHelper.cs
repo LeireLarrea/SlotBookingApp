@@ -1,6 +1,7 @@
 ﻿using SlotBookingApp.Infrastructure.Dtos;
 using System.Globalization;
 
+
 namespace SlotBookingApp.Helpers;
 
 /// <summary>
@@ -22,31 +23,38 @@ public class SlotsHelper
     /// <returns>A list of strings representing all available slots.</returns>
     public async Task<List<string>> GetAllSlots(ScheduleData scheduleData, string date)
     {
-        var monday = _dateHelper.GetWeeksMonday(date);
-        var allSlots = new List<string>();
+        try
+        {
+            var monday = _dateHelper.GetWeeksMonday(date);
+            var allSlots = new List<string>();
 
-        var daySchedules = new[] { scheduleData.Monday, scheduleData.Tuesday, scheduleData.Wednesday,
+            var daySchedules = new[] { scheduleData.Monday, scheduleData.Tuesday, scheduleData.Wednesday,
                                    scheduleData.Thursday, scheduleData.Friday, scheduleData.Saturday,
                                    scheduleData.Sunday };
 
-        Parallel.For(0, 7, i =>
-        {
-            var currentDay = daySchedules[i];
-            if (currentDay != null && currentDay.WorkPeriod != null)
+            Parallel.For(0, 7, i =>
             {
-                var dayToAdd = monday.AddDays(i);
-                var slotsForDay = new List<string>();
-                slotsForDay.AddRange(GetSlotsInPeriod(currentDay.WorkPeriod.StartHour, currentDay.WorkPeriod.LunchStartHour, scheduleData.SlotDurationMinutes, dayToAdd));
-                slotsForDay.AddRange(GetSlotsInPeriod(currentDay.WorkPeriod.LunchEndHour, currentDay.WorkPeriod.EndHour, scheduleData.SlotDurationMinutes, dayToAdd));
-
-                lock (allSlots)
+                var currentDay = daySchedules[i];
+                if (currentDay != null && currentDay.WorkPeriod != null)
                 {
-                    allSlots.AddRange(slotsForDay);
-                }
-            }
-        });
+                    var dayToAdd = monday.AddDays(i);
+                    var slotsForDay = new List<string>();
+                    slotsForDay.AddRange(GetSlotsInPeriod(currentDay.WorkPeriod.StartHour, currentDay.WorkPeriod.LunchStartHour, scheduleData.SlotDurationMinutes, dayToAdd));
+                    slotsForDay.AddRange(GetSlotsInPeriod(currentDay.WorkPeriod.LunchEndHour, currentDay.WorkPeriod.EndHour, scheduleData.SlotDurationMinutes, dayToAdd));
 
-        return allSlots;
+                    lock (allSlots)
+                    {
+                        allSlots.AddRange(slotsForDay);
+                    }
+                }
+            });
+
+            return allSlots;
+        }
+        catch (Exception ex)
+        {
+            throw new ArgumentNullException($"Input data cannot be null. {ex}");
+        }
     }
 
     private List<string> GetSlotsInPeriod(int startTime, int endTime, int slotDuration, DateTime date)
@@ -66,52 +74,66 @@ public class SlotsHelper
     /// <returns>A list of strings of the busy slots.</returns>
     public async Task<List<string>> GetBusySlots(ScheduleData scheduleData)
     {
-        var formattedSlots = new List<string>();
+        try
+        {
+            var formattedSlots = new List<string>();
 
-        Parallel.ForEach(new[] { scheduleData.Monday, scheduleData.Tuesday, scheduleData.Wednesday,
+            Parallel.ForEach(new[] { scheduleData.Monday, scheduleData.Tuesday, scheduleData.Wednesday,
                                    scheduleData.Thursday, scheduleData.Friday, scheduleData.Saturday,
                                    scheduleData.Sunday },
-            (daySchedule) =>
-            {
-                if (daySchedule != null && daySchedule.BusySlots != null)
+                (daySchedule) =>
                 {
-                    foreach (var busySlot in daySchedule.BusySlots)
+                    if (daySchedule != null && daySchedule.BusySlots != null)
                     {
-                        string formattedSlot = $"{busySlot.Start:dd/MM/yyyy HH:mm:ss} - {busySlot.End:dd/MM/yyyy HH:mm:ss}";
-                        lock (formattedSlots)
+                        foreach (var busySlot in daySchedule.BusySlots)
                         {
-                            formattedSlots.Add(formattedSlot);
+                            string formattedSlot = $"{busySlot.Start:dd/MM/yyyy HH:mm:ss} - {busySlot.End:dd/MM/yyyy HH:mm:ss}";
+                            lock (formattedSlots)
+                            {
+                                formattedSlots.Add(formattedSlot);
+                            }
                         }
                     }
-                }
-            });
+                });
 
-        return formattedSlots;
+            return formattedSlots;
+        }
+        catch (Exception ex)
+        {
+            throw new ArgumentNullException($"Input data cannot be null. {ex}");
+        }
     }
 
     public List<object> FormatCalendarEventsForFullCalendar(List<string> availableSlots)
     {
-        List<object> events = new List<object>();
-
-        Parallel.ForEach(availableSlots, slot =>
+        try
         {
-            string[] times = slot.Split(" - ");
-            string startTimeString = times[0];
-            string endTimeString = times[1];
+            List<object> events = new List<object>();
 
-            DateTime startDateTime = DateTime.ParseExact(startTimeString, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
-            DateTime endDateTime = DateTime.ParseExact(endTimeString, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
-
-            string startISO = startDateTime.ToString("yyyy-MM-ddTHH:mm:ss");
-            string endISO = endDateTime.ToString("yyyy-MM-ddTHH:mm:ss");
-
-            events.Add(new
+            Parallel.ForEach(availableSlots, slot =>
             {
-                start = startISO,
-                end = endISO
-            });
-        });
+                string[] times = slot.Split(" - ");
+                string startTimeString = times[0];
+                string endTimeString = times[1];
 
-        return events;
+                DateTime startDateTime = DateTime.ParseExact(startTimeString, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+                DateTime endDateTime = DateTime.ParseExact(endTimeString, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+
+                string startISO = startDateTime.ToString("yyyy-MM-ddTHH:mm:ss");
+                string endISO = endDateTime.ToString("yyyy-MM-ddTHH:mm:ss");
+
+                events.Add(new
+                {
+                    start = startISO,
+                    end = endISO
+                });
+            });
+
+            return events;
+        }
+        catch (Exception ex)
+        {
+            throw new FormatException($"Error parsing slot times: {ex.Message}");
+        }
     }
 }

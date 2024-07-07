@@ -46,16 +46,10 @@
             <returns>A list of strings representing time intervals.</returns>
             <exception cref="T:System.ArgumentOutOfRangeException">Thrown when the intervalMinutes is less than or equal to 0.</exception>
         </member>
-        <member name="T:SlotBookingApp.Helpers.HttpClientHelper">
+        <member name="T:SlotBookingApp.Helpers.HttpHelper">
             <summary>
             Helper class for managing HttpClient instances with basic authentication.
             </summary>
-        </member>
-        <member name="M:SlotBookingApp.Helpers.HttpClientHelper.GetClient">
-            <summary>
-            Initializes and retrieves a HttpClient instance with base URL and basic authentication header.
-            </summary>
-            <returns>The configured HttpClient instance.</returns>
         </member>
         <member name="T:SlotBookingApp.Helpers.SlotsHelper">
             <summary>

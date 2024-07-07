@@ -2,6 +2,7 @@
 using SlotBookingApp.Helpers;
 using SlotBookingApp.Infrastructure.Dtos;
 using SlotBookingApp.Models;
+using System.Net.Http.Headers;
 using System.Text;
 
 namespace SlotBookingApp.Infrastructure.Services;
@@ -9,16 +10,29 @@ namespace SlotBookingApp.Infrastructure.Services;
 public class BookingService : IBookingService
 {
     private readonly ILogger<BookingService> _logger;
-    private readonly HttpClientHelper _httpClientHelper;
+    private readonly IConfiguration _configuration;
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly HttpClient _client;
+    private readonly HttpHelper _httpHelper;
 
-    public BookingService(ILogger<BookingService> logger, HttpClientHelper httpClientHelper)
+
+    public BookingService(ILogger<BookingService> logger, IConfiguration configuration, IHttpClientFactory httpClientFactory, HttpHelper httpHelper)
     {
         _logger = logger;
-        _httpClientHelper = httpClientHelper;
+
+        _configuration = configuration;
+
+        _httpClientFactory = httpClientFactory;
+        _client = _httpClientFactory.CreateClient();
+        _client.BaseAddress = new Uri(_configuration["DraliatestSettings:BaseUrl"]);
+
+        _httpHelper = httpHelper;
+        var authHeaderValue = _httpHelper.GetAuthHeaderValue();
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authHeaderValue);
     }
 
 
-    private async Task<SlotBookingDto> CreateBookingFromCalendarEvent(CalendarEventModel calendarEvent)
+    public async Task<SlotBookingDto> CreateBookingFromCalendarEvent(CalendarEventModel calendarEvent)
     {
         var calendarEventJson = JsonConvert.SerializeObject(calendarEvent);
         SlotBookingDto slotBooking = JsonConvert.DeserializeObject<SlotBookingDto>(calendarEventJson);
@@ -58,8 +72,7 @@ public class BookingService : IBookingService
             var json = JsonConvert.SerializeObject(slotBookingDto);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var httpClient = _httpClientHelper.GetClient();
-            var response = await httpClient.PostAsync("availability/TakeSlot", content);
+            var response = await _client.PostAsync("availability/TakeSlot", content);
             response.EnsureSuccessStatusCode();
 
             _logger.LogInformation($"PostSlotBooking call COMPLETED for {slotBookingDto.Start}");
