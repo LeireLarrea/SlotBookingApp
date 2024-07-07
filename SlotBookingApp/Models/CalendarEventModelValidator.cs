@@ -17,14 +17,17 @@ public class CalendarEventModelValidator : AbstractValidator<CalendarEventModel>
            .Matches("^[a-zA-Z\\s]*$").WithMessage("SECOND NAME can contain only letters and spaces");
 
         RuleFor(x => x.Email)
-           .NotEmpty().WithMessage("Please fill the Email")
-           .NotNull().WithMessage("Email cannot be null")
-           .EmailAddress().WithMessage("Invalid EMAIL format");
+            .Cascade(CascadeMode.Stop) 
+            .NotEmpty().WithMessage("Please fill email")
+            .NotNull().WithMessage("Email cannot be null")
+            .When(x => string.IsNullOrEmpty(x.Email)) 
+            .EmailAddress().WithMessage("Invalid email format");
 
-        RuleFor(x => x.Phone)
-           .NotEmpty().WithMessage("Please fill the Phone")
-           .NotNull().WithMessage("Phone cannot be null")
-           .Must(BeAValidPhoneNumber).WithMessage("You PHONE NUMBER must be between 11 - 15 numbers long");
+        RuleFor(x => x.Phone).Cascade(CascadeMode.Stop)
+            .NotEmpty().WithMessage("Please fill phone number")
+            .NotNull().WithMessage("Phone number cannot be null")
+            .When(x => string.IsNullOrEmpty(x.Email))
+            .Must(BeAValidPhoneNumber).WithMessage("You PHONE NUMBER must be between 11 - 15 numbers long");
 
         RuleFor(x => x.Comments)
           .NotEmpty().WithMessage("Please fill the Comments")
