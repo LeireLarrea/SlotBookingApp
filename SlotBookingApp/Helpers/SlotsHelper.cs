@@ -1,4 +1,5 @@
 ﻿using SlotBookingApp.Infrastructure.Dtos;
+using System.Collections.Concurrent;
 using System.Globalization;
 
 
@@ -10,6 +11,7 @@ namespace SlotBookingApp.Helpers;
 public class SlotsHelper
 {
     private readonly DateHelper _dateHelper;
+
     public SlotsHelper(DateHelper dateHelper)
     {
         _dateHelper = dateHelper;
@@ -21,96 +23,122 @@ public class SlotsHelper
     /// <param name="scheduleData">The schedule data.</param>
     /// <param name="date">The date in "yyyy-MM-dd" format for which slots are requested.</param>
     /// <returns>A list of strings representing all available slots.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the scheduleData or date are null</exception>
+
     public async Task<List<string>> GetAllSlots(ScheduleData scheduleData, string date)
     {
-        try
+        if (scheduleData == null)
         {
-            var monday = _dateHelper.GetWeeksMonday(date);
-            var allSlots = new List<string>();
+            throw new ArgumentNullException(nameof(scheduleData), "ScheduleData cannot be null.");
+        }
 
-            var daySchedules = new[] { scheduleData.Monday, scheduleData.Tuesday, scheduleData.Wednesday,
-                                   scheduleData.Thursday, scheduleData.Friday, scheduleData.Saturday,
-                                   scheduleData.Sunday };
+        if (date == null)
+        {
+            throw new ArgumentNullException(nameof(date), "Date cannot be null.");
+        }
 
-            Parallel.For(0, 7, i =>
+        var monday = _dateHelper.GetWeeksMonday(date);
+        var daySchedules = GetDaySchedules(scheduleData);
+        var tasks = new List<Task>();
+        var allSlots = new ConcurrentBag<string>();
+
+        foreach (var dayOfWeek in Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>())
+        {
+            var currentDay = daySchedules[dayOfWeek];
+            if (currentDay?.WorkPeriod != null)
             {
-                var currentDay = daySchedules[i];
-                if (currentDay != null && currentDay.WorkPeriod != null)
+                var dayToAdd = monday.AddDays((int)dayOfWeek - (int)DayOfWeek.Monday);
+
+                tasks.Add(Task.Run(() =>
                 {
-                    var dayToAdd = monday.AddDays(i);
-                    var slotsForDay = new List<string>();
-                    slotsForDay.AddRange(GetSlotsInPeriod(currentDay.WorkPeriod.StartHour, currentDay.WorkPeriod.LunchStartHour, scheduleData.SlotDurationMinutes, dayToAdd));
+                    var slotsForDay = GetSlotsInPeriod(currentDay.WorkPeriod.StartHour, currentDay.WorkPeriod.LunchStartHour, scheduleData.SlotDurationMinutes, dayToAdd);
                     slotsForDay.AddRange(GetSlotsInPeriod(currentDay.WorkPeriod.LunchEndHour, currentDay.WorkPeriod.EndHour, scheduleData.SlotDurationMinutes, dayToAdd));
 
-                    lock (allSlots)
+                    foreach (var slot in slotsForDay)
                     {
-                        allSlots.AddRange(slotsForDay);
+                        allSlots.Add(slot);
                     }
-                }
-            });
+                }));
+            }
+        }
 
-            return allSlots;
-        }
-        catch (Exception ex)
-        {
-            throw new ArgumentNullException($"Input data cannot be null. {ex}");
-        }
+        await Task.WhenAll(tasks);
+
+        return allSlots.ToList();
     }
 
-    private List<string> GetSlotsInPeriod(int startTime, int endTime, int slotDuration, DateTime date)
+
+
+    private List<string> GetSlotsInPeriod(int startHour, int endHour, int slotDuration, DateTime date)
     {
-        DateTime startHourTime = date.Date.AddHours(startTime);
-        DateTime lunchStartHourTime = date.Date.AddHours(endTime);
+        if (slotDuration <= 0)
+        {
+            throw new ArgumentException("Slot duration must be positive.", nameof(slotDuration));
+        }
+        if (startHour >= endHour)
+        {
+            throw new ArgumentException("Start hour must be less than end hour.", nameof(startHour));
+        }
 
-        List<string> periodSlots = _dateHelper.GenerateTimeList(startHourTime, lunchStartHourTime, slotDuration);
+        DateTime periodStart = date.Date.AddHours(startHour);
+        DateTime periodEnd = date.Date.AddHours(endHour);
 
-        return periodSlots;
+        return _dateHelper.GenerateTimeList(periodStart, periodEnd, slotDuration);
     }
+
 
     /// <summary>
     /// Retrieves busy slots from the schedule data.
     /// </summary>
     /// <param name="scheduleData">The schedule data.</param>
     /// <returns>A list of strings of the busy slots.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the scheduleData is null</exception>
     public async Task<List<string>> GetBusySlots(ScheduleData scheduleData)
     {
+        if (scheduleData == null)
+        {
+            throw new ArgumentNullException(nameof(scheduleData), "ScheduleData cannot be null.");
+        }
+
+        var daySchedules = GetDaySchedules(scheduleData);
+
+        var formattedSlots = new ConcurrentBag<string>();
+        var tasks = daySchedules.Select(async kvp =>
+        {
+            var daySchedule = kvp.Value;
+            if (daySchedule?.BusySlots != null)
+            {
+                foreach (var busySlot in daySchedule.BusySlots)
+                {
+                    string formattedSlot = $"{busySlot.Start:dd/MM/yyyy HH:mm:ss} - {busySlot.End:dd/MM/yyyy HH:mm:ss}";
+                    formattedSlots.Add(formattedSlot);
+                }
+            }
+        }).ToArray();
+
         try
         {
-            var formattedSlots = new List<string>();
-
-            Parallel.ForEach(new[] { scheduleData.Monday, scheduleData.Tuesday, scheduleData.Wednesday,
-                                   scheduleData.Thursday, scheduleData.Friday, scheduleData.Saturday,
-                                   scheduleData.Sunday },
-                (daySchedule) =>
-                {
-                    if (daySchedule != null && daySchedule.BusySlots != null)
-                    {
-                        foreach (var busySlot in daySchedule.BusySlots)
-                        {
-                            string formattedSlot = $"{busySlot.Start:dd/MM/yyyy HH:mm:ss} - {busySlot.End:dd/MM/yyyy HH:mm:ss}";
-                            lock (formattedSlots)
-                            {
-                                formattedSlots.Add(formattedSlot);
-                            }
-                        }
-                    }
-                });
-
-            return formattedSlots;
+            await Task.WhenAll(tasks);
         }
         catch (Exception ex)
         {
-            throw new ArgumentNullException($"Input data cannot be null. {ex}");
+            throw new InvalidOperationException("An error occurred while processing the schedule data.", ex);
         }
+
+        return formattedSlots.ToList();
     }
 
+    /// <summary>
+    /// Formats a list of available slots to a format that FullCalendar.io understands
+    /// </summary>
+    /// <param name="availableSlots">A list of strings with all the available slots.</param>
+    /// <returns>A list of objects of the available slots.</returns>
+    /// <exception cref="FormatException">Thrown when the datetime parsing fails</exception>
     public List<object> FormatCalendarEventsForFullCalendar(List<string> availableSlots)
     {
         try
         {
-            List<object> events = new List<object>();
-
-            Parallel.ForEach(availableSlots, slot =>
+            var tasks = availableSlots.Select(async slot =>
             {
                 string[] times = slot.Split(" - ");
                 string startTimeString = times[0];
@@ -122,18 +150,43 @@ public class SlotsHelper
                 string startISO = startDateTime.ToString("yyyy-MM-ddTHH:mm:ss");
                 string endISO = endDateTime.ToString("yyyy-MM-ddTHH:mm:ss");
 
-                events.Add(new
+                return new
                 {
                     start = startISO,
                     end = endISO
-                });
+                };
             });
 
-            return events;
+            var results = Task.WhenAll(tasks).Result;
+            return results.Cast<object>().ToList();
         }
         catch (Exception ex)
         {
             throw new FormatException($"Error parsing slot times: {ex.Message}");
         }
     }
+
+
+    private Dictionary<DayOfWeek, DaySchedule> GetDaySchedules(ScheduleData scheduleData)
+    {
+        return Enum.GetValues(typeof(DayOfWeek))
+            .Cast<DayOfWeek>()
+            .ToDictionary(day => day, day => GetDaySchedule(day, scheduleData));
+    }
+
+    private DaySchedule GetDaySchedule(DayOfWeek day, ScheduleData scheduleData)
+    {
+        return day switch
+        {
+            DayOfWeek.Monday => scheduleData.Monday,
+            DayOfWeek.Tuesday => scheduleData.Tuesday,
+            DayOfWeek.Wednesday => scheduleData.Wednesday,
+            DayOfWeek.Thursday => scheduleData.Thursday,
+            DayOfWeek.Friday => scheduleData.Friday,
+            DayOfWeek.Saturday => scheduleData.Saturday,
+            DayOfWeek.Sunday => scheduleData.Sunday,
+            _ => null
+        };
+    }
+
 }

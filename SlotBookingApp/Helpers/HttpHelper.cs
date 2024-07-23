@@ -29,6 +29,6 @@ public class HttpHelper
     {
         var credentials = $"{_username}:{_password}";
         var base64Credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes(credentials));
-        return $"Basic {base64Credentials}";
+        return base64Credentials;
     }
 }
